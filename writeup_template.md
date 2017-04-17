@@ -134,9 +134,11 @@ I did this in lines # through # in my code in `my_other_file.py`
 
 
 
-####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+#### 6. Example image with lane area:
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+This functionality is split across functions `process_image()` and `mark_lane()` in `AdvancedLaneLines.ipynb`. `mark_lane()` returns an warped lane marking image, which is unwarped and combined with original image in `prcess_image()`
+
+Here is an example of my result on a test image:
 
 ![alt text][image6]
 
@@ -153,11 +155,14 @@ Here's a [link to my video result](./output.mp4)
 ### Discussion
 
 ##### Challenges:
-   - Lane line identification from high contrast background roads for sunny weather.
+   - Lane line identification from high contrast background roads.
    - Filtering noise from tree shades
-   - 
+   - Perspective transformation of curvy lanes.
+   - Targetted lane search for curvy lanes.
+   - Fitting polynomial with fewer identified lane pixels   
+
+##### Drawbacks:
+   - Poor transformation of Hairpin bend lanes.
+   - Hairpin bend lanes can fool targetted lane search.
+   - Identifying lane lines under varying weather conditions.
    
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
-
