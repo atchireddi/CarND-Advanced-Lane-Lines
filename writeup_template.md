@@ -22,16 +22,39 @@
 [image6]: ./examples/example_output.jpg "Output"
 [video1]: ./project_video.mp4 "Video"
 
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
-    - Camera Calibration
-    - Perspective Transform
-    - Color Transformation and Gradient
-    - Lane pixel detection
-    - Finding lane boundary
-    - Caliculate Lane Curvature
----
-
- Let's look at the rubric points at each stage of pipeline.
+ 
+ ### Pipeline Overview
+ 
+ ```
+ # pipeline
+ def process_image(img):
+    
+    # Undistort image
+    undist_img = undistort(img)             # color_img in & out
+    
+    # Generate binary image from color and gradient
+    binary_img = binary_image(undist_img)   # color_img in & binary_img out
+    
+    # Apply Mask
+    masked_img = apply_mask(binary_img)      # binary_img in & binary_img out
+    
+    # Transform masked image 
+    warp_img = warp(masked_img,M)          # binary_img in & binary_img out 
+    
+    # Mark Lane with green color
+    lane_img = mark_lane(warp_img)          # binary_img in & color_img out
+    
+    # Unwarp lane image
+    unwarp_lane_img = warp(lane_img,Minv)   # color_img in & color_img out
+    
+    # Merge Lane image on to original image
+    output = cv2.addWeighted(img, 1, unwarp_lane_img, 0.5, 0.0)   # color_img in & color_img out
+    
+    return(output)
+ ```
+ 
+ 
+ Let's look at the the details of each  pipeline stage.
  
 ###Camera Calibration
 
@@ -68,10 +91,10 @@ Perspective transformation is implemented as two functions,
     
     Code can be found in `AdvanacedLaneLines.ipynb`. 
     
-The `warper()` function takes as inputs an image (`img`), as well as transformation matrix(inverse transformation matrix) and
+The `warper()` function takes inputs an image, as well as transformation matrix(inverse transformation matrix) and
 returns warped/unwarped image.  
     
-Having a own function for generating transformation matrix, we can generate transform matrix once and re-use it for
+Having a own function for generating transformation matrix, can generate transform matrix once and re-use it for
 transforming each frame. I chose the hardcode the source and destination points in the following manner:
     
 
@@ -93,15 +116,23 @@ Code can be found in `perspective_transform.ipynb`
 
 ![alt text][image4]
 
+
+
+
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
 
 ![alt text][image5]
 
+
+
+
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 I did this in lines # through # in my code in `my_other_file.py`
+
+
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
@@ -109,15 +140,15 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 ![alt text][image6]
 
----
 
 
 
-### Pipeline (video)
+### Pipeline Output On Video Stream (video)
 
 Here's a [link to my video result](./output.mp4)
 
----
+
+
 
 ### Discussion
 
