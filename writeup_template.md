@@ -53,9 +53,20 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ![alt text][image3]
 
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+####3. Perspective Transform
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+  Perspective transformation is implemented as two functions,
+    - `gen_transform_matrxi()`  :  Computes transformation matrices.
+    - `warp()` :                   Takes in image, applies tranformation.
+    
+    Code can be found in `AdvanacedLaneLines.ipynb`. 
+    
+    The `warper()` function takes as inputs an image (`img`), as well as transformation matrix(inverse transformation matrix) and
+    returns warped/unwarped image.  
+    
+    Having a own function for generating transformation matrix, we can generate transform matrix once and re-use it for
+  transforming each frame. I chose the hardcode the source and destination points in the following manner:
+    
 
 ```
 src = np.float32(
