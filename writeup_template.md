@@ -41,9 +41,12 @@
 
   I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
 
+
+
+
 ![alt text][image1]
 
-###Pipeline (single images)
+### Pipeline (single images)
 
 ####1. Provide an example of a distortion-corrected image.
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
@@ -53,7 +56,10 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ![alt text][image3]
 
-####3. Perspective Transform
+
+
+
+#### 3. Perspective Transform
 
 Perspective transformation is implemented as two functions,
   
@@ -69,29 +75,21 @@ Having a own function for generating transformation matrix, we can generate tran
 transforming each frame. I chose the hardcode the source and destination points in the following manner:
     
 
-```
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-
-```
-This resulted in the following source and destination points:
+Below are source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 582, 455      | 300, 0        | 
+| 700, 455      | 1000, 0       |
+| 1150, 720     | 1000, 0       |
+| 150, 720      | 300, 0        |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+
+Code can be found in `perspective_transform.ipynb`
+
+
+
 
 ![alt text][image4]
 
@@ -113,15 +111,15 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 ---
 
-###Pipeline (video)
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+### Pipeline (video)
+
+Here's a [link to my video result](./output.mp4)
 
 ---
 
-###Discussion
+### Discussion
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
