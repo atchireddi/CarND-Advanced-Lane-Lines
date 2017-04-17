@@ -55,17 +55,18 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ####3. Perspective Transform
 
-  Perspective transformation is implemented as two functions,
+Perspective transformation is implemented as two functions,
+  
     - `gen_transform_matrxi()`  :  Computes transformation matrices.
     - `warp()` :                   Takes in image, applies tranformation.
     
     Code can be found in `AdvanacedLaneLines.ipynb`. 
     
-    The `warper()` function takes as inputs an image (`img`), as well as transformation matrix(inverse transformation matrix) and
-    returns warped/unwarped image.  
+The `warper()` function takes as inputs an image (`img`), as well as transformation matrix(inverse transformation matrix) and
+returns warped/unwarped image.  
     
-    Having a own function for generating transformation matrix, we can generate transform matrix once and re-use it for
-  transforming each frame. I chose the hardcode the source and destination points in the following manner:
+Having a own function for generating transformation matrix, we can generate transform matrix once and re-use it for
+transforming each frame. I chose the hardcode the source and destination points in the following manner:
     
 
 ```
