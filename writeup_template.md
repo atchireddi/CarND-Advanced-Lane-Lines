@@ -55,18 +55,22 @@
     masked_img = apply_mask(binary_img)      # binary_img in & binary_img out
     
     # Transform masked image 
-    warp_img = warp(masked_img,M)          # binary_img in & binary_img out 
+    warp_img = warp(masked_img,M)             # binary_img in & binary_img out 
     
     # Mark Lane with green color
-    lane_img = mark_lane(warp_img)          # binary_img in & color_img out
+    lane_fit, lane_img = mark_lane(warp_img)   # binary_img in & color_img out
     
     # Unwarp lane image
-    unwarp_lane_img = warp(lane_img,Minv)   # color_img in & color_img out
+    unwarp_lane_img = warp(lane_img,Minv)      # color_img in & color_img out
     
     # Merge Lane image on to original image
     output = cv2.addWeighted(img, 1, unwarp_lane_img, 0.5, 0.0)   # color_img in & color_img out
     
+    # Mark Curvature
+    output = cal_curvature(output,lane_fit)     # color_img in & color_img out
+    
     return(output)
+    
  ```
  
  
@@ -134,8 +138,8 @@ Below are source and destination points:
 |:-------------:|:-------------:| 
 | 582, 455      | 300, 0        | 
 | 700, 455      | 1000, 0       |
-| 1150, 720     | 1000, 0       |
-| 150, 720      | 300, 0        |
+| 1150, 720     | 1000, 720     |
+| 150, 720      | 300, 720      |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a 
 test image and its warped counterpart to verify that the lines appear parallel in the warped image.
@@ -179,9 +183,69 @@ Its warped binary image used for Lane-line identification.
 
 #### 5. Radius of Curvature:
 
-I did this in lines # through # in my code in `my_other_file.py`
+Lane curvature is estimated from Lane-line ploynomial fit function. 
 
+The radius of curvature (awesome tutorial here) at any point x of the function x=f(y) is given as follows:
 
+R
+​curve
+​​ =
+​∣
+​dy
+​2
+​​ 
+​
+​d
+​2
+​​ x
+​​ ∣
+​
+​[1+(
+​dy
+​
+​dx
+​​ )
+​2
+​​ ]
+​3/2
+​​ 
+​​ 
+
+In the case of the second order polynomial above, the first and second derivatives are:
+
+f
+​′
+​​ (y)=
+​dy
+​
+​dx
+​​ =2Ay+B
+
+f
+​′′
+​​ (y)=
+​dy
+​2
+​​ 
+​
+​d
+​2
+​​ x
+​​ =2A
+
+So, our equation for radius of curvature becomes:
+
+R
+​curve
+​​ =
+​∣2A∣
+​
+​(1+(2Ay+B)
+​2
+​​ )
+​3/2
+​​ 
+​​ 
 
 #### 6. Example image with lane area:
 
