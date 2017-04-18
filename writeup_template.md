@@ -79,8 +79,8 @@ Let's look at the the details of each  pipeline stage.
 
 #### 1. Distortion Correction:
 
-I have camera matrix & distortion coeffients computed with `cv2.calibrateCamera()` from sample chessboard calibration images.
-From the video stream, each frame was pre-processed with `cv2.undistort()` function using pre computed distortion coeffients
+I have camera matrix & distortion coefficients computed with `cv2.calibrateCamera()` using sample chessboard calibration images.
+Each frame from the video stream, pre-processed with `cv2.undistort()` function using pre computed distortion coeffients
 and camera matrix.
 
 code for correcting image distortion can be found as function `undistort()` in `AdvancedLaneLines.ipynb`
@@ -95,7 +95,7 @@ Below is a distortion corrected sample image from video stream.
 #### 2. Color transforms, gradients & thresholded binary image:
 
 I used a combination of s-channel from HLS color space and v-channel from HSV color space, for color transformations. 
-Thresholds used for lane identification are x and 1.5x for s-channel and v-channel respectively. compare to l-channel 
+Thresholds used for lane identification are x and 1.5x for s-channel and v-channel respectively. compare to L-channel 
 from HLS color space, v-channel from HSV space, filters shadows while sligthly less comprimised on lane line identification.
 
 since we were more interested in verticle lane lines, can't think of better friend than `sobel` operator in x-direciton.
@@ -110,7 +110,7 @@ Finally combination of `(s-channel & v-channel) | gradient` resulted in decent b
 
 Here's an example of my output for this step.  
 
-(note: this is not actually from one of the test images)
+
 ![alt text][image3]
 
 
@@ -125,11 +125,12 @@ Perspective transformation is implemented as two functions,
     
     Code can be found in `AdvanacedLaneLines.ipynb`. 
     
-The `warper()` function takes inputs an image, as well as transformation matrix(inverse transformation matrix) and
-returns warped/unwarped image.  
+The `warp()` function takes inputs an image, as well as transformation matrix(inverse transformation matrix) and
+returns warped/unwarped image. It can perform forward and backward transformation relying on image shape properties.
+Pipeline does forward tranformation on binary image and backward transformation on color image.
     
 Having a own function for generating transformation matrix, can generate transform matrix once and re-use it for
-transforming each frame. I chose the hardcode the source and destination points in the following manner:
+transforming each frame. I chose to hardcode the source and destination points in the following manner:
     
 
 Below are source and destination points:
@@ -159,7 +160,7 @@ identify windows for possible Lane-pixel locations. window height & width are op
 identification. I choose `window_width = 100` and `window_height=80`.
 
 For first image, lane approximated with window centroids and then refined with targetted search. For economical
-computation, based on prevailing lane properties, lane lines of subsequent frames won't be far off. Simply
+computation, I rely on prevailing lane properties, Lane-line pixels of subsequent frames are  won't be far off. Simply
 an exhaustive Lane-line pixel search would be comutationally expensive. For sequent frames I restrict
 Lane-line pixel search with in a `window of 100 pixels` from know Lane-line.
 
@@ -174,7 +175,7 @@ Code is implemented across functions `find_window_centriods()`, `get_lane_fit()`
    - `adjust_lane_fit()`       : Performs targeted search for Lane-line pixels and re-generates polynomial fit.
 
 Below is the sample image highlighting fitted Lane-line(red) and targetted search region(blue lines).
-Its warped binary image used for Lane-line identification.
+warped binary image used for Lane-line identification.
 
 ![alt text][image5]
 
@@ -183,14 +184,14 @@ Its warped binary image used for Lane-line identification.
 
 #### 5. Radius of Curvature:
 
-Lane curvature estimated from Lane-line ploynomial fit function, results curvature w.r.t pixels of image. I mapped
+Lane curvature estimated from Lane-line ploynomial fit function. Curvature calculated is in terms pixels of image, I mapped
 the pixels to real world distances by approximating physical lane in the field of view of the camera. Below are the
 assumptions for this project.
  
    - Lane is about 30 meters Long and 3.7 meters wide.
 
 For vehicle offset calculation from center of lane, I average Lane-line pixel's x-coordinate at the bottom of the image
-and compared against center of Image, assuming camera is mounted at the center of the vehicle. Pixel offset is 
+and compared against center of Image. For this I presume camera is mounted at the center of the vehicle. Pixel offset is 
 mapped to realworld distance by above assumptions.
 
 code for Lane curvature and Vehicle's offset from center of Lane can be found in `cal_curvature()` function in 
