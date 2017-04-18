@@ -39,7 +39,7 @@
 
 ### Pipeline (single images)
 
-### Pipeline Overview
+#### Pipeline Overview
  
  ```
  # pipeline
@@ -75,7 +75,14 @@ Let's look at the the details of each  pipeline stage.
 
 #### 1. Distortion Correction:
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+I have camera matrix & distortion coeffients computed with `cv2.calibrateCamera()` from sample chessboard calibration images.
+From the video stream, each frame was pre-processed with `cv2.undistort()` function using pre computed distortion coeffients
+and camera matrix.
+
+code for correcting image distortion can be found as function `undistort()` in `AdvancedLaneLines.ipynb`
+
+Below is a distortion corrected sample image from video stream.
+
 ![alt text][image2]
 
 
@@ -83,8 +90,23 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Color transforms, gradients & thresholded binary image:
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of s-channel from HLS color space and v-channel from HSV color space, for color transformations. 
+Thresholds used for lane identification are x and 1.5x for s-channel and v-channel respectively. compare to l-channel 
+from HLS color space, v-channel from HSV space, filters shadows while sligthly less comprimised on lane line identification.
 
+since we were more interested in verticle lane lines, can't think of better friend than `sobel` operator in x-direciton.
+Gradients are computed on v-channel applying `sobel` operator.
+
+Color tranformations works pretty well identifying lane line under high contrast road conditions and filtering tree shadows,
+while gradient based lane line extraction is superior under normal conditions.
+
+Finally combination of `(s-channel & v-channel) | gradient` resulted in decent binary image for project video.
+
+`binary_image()` function in `AdvancedLaneLines.ipynb` has relevent code implementation.
+
+Here's an example of my output for this step.  
+
+(note: this is not actually from one of the test images)
 ![alt text][image3]
 
 
@@ -115,7 +137,8 @@ Below are source and destination points:
 | 1150, 720     | 1000, 0       |
 | 150, 720      | 300, 0        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a 
+test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
 Code can be found in `perspective_transform.ipynb`
 
@@ -126,7 +149,28 @@ Code can be found in `perspective_transform.ipynb`
 
 #### 4. Lane-line pixel identification and Polynomial fit:
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+
+A sliding window approached followed for Lane-pixel identification, where a convolution signal thresholded to 
+identify windows for possible Lane-pixel locations. window height & width are optimized for better lane
+identification. I choose `window_width = 100` and `window_height=80`.
+
+For first image, lane approximated with window centroids and then refined with targetted search. For economical
+computation, based on prevailing lane properties, lane lines of subsequent frames won't be far off. Simply
+an exhaustive Lane-line pixel search would be comutationally expensive. For sequent frames I restrict
+Lane-line pixel search with in a `window of 100 pixels` from know Lane-line.
+
+`cv2.polyfit()` is used to generate polynomial fit for identified Lane-line pixels
+
+Code is implemented across functions `find_window_centriods()`, `get_lane_fit()`, `adjust_lane_fit()` functions in
+`AdvancedLaneLines.ipynb`.
+
+   - `find_window_centriods()` : Performs sliding window search, Identifies Lane-line pixel regions and returns window centriods
+   - `get_lane_fit()`          : Calls `find_window_centriods()` and generates polynominal fit from window centriods.
+                                 called on first frame.
+   - `adjust_lane_fit()`       : Performs targeted search for Lane-line pixels and re-generates polynomial fit.
+
+Below is the sample image highlighting fitted Lane-line(red) and targetted search region(blue lines).
+Its warped binary image used for Lane-line identification.
 
 ![alt text][image5]
 
@@ -141,7 +185,10 @@ I did this in lines # through # in my code in `my_other_file.py`
 
 #### 6. Example image with lane area:
 
-This functionality is split across functions `process_image()` and `mark_lane()` in `AdvancedLaneLines.ipynb`. `mark_lane()` returns an warped lane marking image, which is unwarped and combined with original image in `prcess_image()`
+To visualise the performance of pipeline, Lane has been projected on to actual image frame.
+This functionality is split across functions `process_image()` and `mark_lane()` in `AdvancedLaneLines.ipynb`.
+`opencv` functions `cv2.fillPoly()` is used for lane projection.`mark_lane()` returns an warped lane marking image, 
+which is unwarped and combined with original image in `prcess_image()`
 
 Here is an example of my result on a test image:
 
