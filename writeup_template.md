@@ -183,69 +183,19 @@ Its warped binary image used for Lane-line identification.
 
 #### 5. Radius of Curvature:
 
-Lane curvature is estimated from Lane-line ploynomial fit function. 
+Lane curvature estimated from Lane-line ploynomial fit function, results curvature w.r.t pixels of image. I mapped
+the pixels to real world distances by approximating physical lane in the field of view of the camera. Below are the
+assumptions for this project.
+ 
+   - Lane is about 30 meters Long and 3.7 meters wide.
 
-The radius of curvature (awesome tutorial here) at any point x of the function x=f(y) is given as follows:
+For vehicle offset calculation from center of lane, I average Lane-line pixel's x-coordinate at the bottom of the image
+and compared against center of Image, assuming camera is mounted at the center of the vehicle. Pixel offset is 
+mapped to realworld distance by above assumptions.
 
-R
-​curve
-​​ =
-​∣
-​dy
-​2
-​​ 
-​
-​d
-​2
-​​ x
-​​ ∣
-​
-​[1+(
-​dy
-​
-​dx
-​​ )
-​2
-​​ ]
-​3/2
-​​ 
-​​ 
-
-In the case of the second order polynomial above, the first and second derivatives are:
-
-f
-​′
-​​ (y)=
-​dy
-​
-​dx
-​​ =2Ay+B
-
-f
-​′′
-​​ (y)=
-​dy
-​2
-​​ 
-​
-​d
-​2
-​​ x
-​​ =2A
-
-So, our equation for radius of curvature becomes:
-
-R
-​curve
-​​ =
-​∣2A∣
-​
-​(1+(2Ay+B)
-​2
-​​ )
-​3/2
-​​ 
-​​ 
+code for Lane curvature and Vehicle's offset from center of Lane can be found in `cal_curvature()` function in 
+`AdvancedLaneLines.ipynb` file. `cal_curvature()` takes image and lane fitted polynomial coeffients and returns
+image with annotated curvature and Vechicle offset.
 
 #### 6. Example image with lane area:
 
